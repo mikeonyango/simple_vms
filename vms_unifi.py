@@ -18,8 +18,8 @@ except AttributeError:
 else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
-cond = sqlite3.connect("messids.db")
-conn = sqlite3.connect("szvouchers.db")
+
+conn = sqlite3.connect("vouchers.db")
 
 # Setup the Gmail API
 SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
@@ -43,17 +43,6 @@ message_id = results['messages'][0]['id']
 # use the message id to get the actual message, including any attachments
 message = service.users().messages().get(userId='me', id=message_id).execute()
  
-# now the message object contains the entire recent message
-
-# labels = category.get('labels',[])
-# print (labels)
-# if not labels:
-#     print('No labels found.')
-# else:
-#     print('Labels:')
-#     for label in labels:
-#         print(label['name'])
-
 # print (message)
 a = (message['snippet'])
 # print(a)
@@ -67,8 +56,6 @@ e = n.split ("from ")[1]
 # print (e)
 f= e[:12]
 print (f)
-
-
 
 #selecting from the list of voucher codes the duration for which the voucher code will be valid after first activation.
 def select_voucher():
@@ -88,7 +75,7 @@ def select_voucher():
 validity = select_voucher()
 
 #now selecting the actual voucher code valid for the duration specified above
-query = f"SELECT code FROM szvoucherslist WHERE duration = '{validity}'"
+query = f"SELECT code FROM voucherslist WHERE duration = '{validity}'"
 c=conn.cursor()
 c.execute(query)
 code = c.fetchone()
@@ -98,7 +85,7 @@ x = x[:-3]
 x = x[-11:]
 
 #deleting the selected voucher code so it is not selected for a second time.
-query2 = f"DELETE FROM szvoucherslist WHERE code = '{x}'" 
+query2 = f"DELETE FROM voucherslist WHERE code = '{x}'" 
 c.execute(query2)
 
 conn.commit()
@@ -128,9 +115,9 @@ def smstosend():
 
 z = smstosend()
 
-con = http.client.HTTPSConnection("rnjyl.api.infobip.com")
+con = http.client.HTTPSConnection("bulksmsapiurl")
 
-payload = "{\"from\":\"SPEEDZONE\",\"to\":\""+f+"\",\"text\":\""+z+"\"}"
+payload = "{\"from\":\"WIFIPROVIDER\",\"to\":\""+f+"\",\"text\":\""+z+"\"}"
 
 headers = {
     'authorization': "Basic masked==",
